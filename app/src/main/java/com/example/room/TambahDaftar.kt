@@ -1,6 +1,7 @@
 package com.example.room
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -15,7 +16,8 @@ import com.example.room.database.daftarBelanjaDB
 import com.example.room.helper.DateHelper.getCurrentDate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class TambahDaftar : AppCompatActivity() {
 
@@ -26,8 +28,8 @@ class TambahDaftar : AppCompatActivity() {
 
     var tanggal = getCurrentDate()
     var DB = daftarBelanjaDB.getDatabase(this)
-    var iID : Int = 0
-    var iAddEdit : Int = 0
+    var iID: Int = 0
+    var iAddEdit: Int = 0
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,10 +54,12 @@ class TambahDaftar : AppCompatActivity() {
             _btnUpdate.visibility = View.VISIBLE
             _etItem.isEnabled = false
 
-            CoroutineScope(Dispatchers.IO).async {
+            CoroutineScope(Dispatchers.IO).launch {
                 val item = DB.fundaftarBelanjaDAO().getItem(iID)
-                _etItem.setText(item.item)
-                _etJumlah.setText(item.item)
+                withContext(Dispatchers.Main) {
+                    _etItem.setText(item.item)
+                    _etJumlah.setText(item.jumlah)
+                }
             }
         }
 
@@ -66,25 +70,44 @@ class TambahDaftar : AppCompatActivity() {
         }
 
         _btnTambah.setOnClickListener {
-            CoroutineScope(Dispatchers.IO).async {
+            val itemText = _etItem.text.toString()
+            val jumlahText = _etJumlah.text.toString()
+
+            if (itemText.isEmpty() || jumlahText.isEmpty()) {
+                Toast.makeText(this, "Field tidak boleh kosong", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            CoroutineScope(Dispatchers.IO).launch {
                 DB.fundaftarBelanjaDAO().insert(
                     daftarBelanja(
                         tanggal = tanggal,
-                        item = _etItem.text.toString(),
-                        jumlah = _etJumlah.text.toString()
+                        item = itemText,
+                        jumlah = jumlahText
                     )
                 )
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@TambahDaftar, "Data berhasil ditambahkan", Toast.LENGTH_SHORT).show()
+                    val intent = Intent(this@TambahDaftar, MainActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+                    startActivity(intent)
+                    finish()
+                }
             }
         }
 
         _btnUpdate.setOnClickListener {
-            CoroutineScope(Dispatchers.IO).async {
+            CoroutineScope(Dispatchers.IO).launch {
                 DB.fundaftarBelanjaDAO().update(
                     isi_tanggal = tanggal,
                     isi_item = _etItem.text.toString(),
                     isi_jumlah = _etJumlah.text.toString(),
                     pilihid = iID
                 )
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@TambahDaftar, "Data berhasil diperbarui", Toast.LENGTH_SHORT).show()
+                    finish()
+                }
             }
         }
     }

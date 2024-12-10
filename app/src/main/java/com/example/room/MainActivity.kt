@@ -13,12 +13,12 @@ import com.example.room.database.daftarBelanja
 import com.example.room.database.daftarBelanjaDB
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 private lateinit var DB: daftarBelanjaDB
-private lateinit var adpDaftar : adapterDaftar
-private var arDaftar : MutableList<daftarBelanja> = mutableListOf()
+private lateinit var adpDaftar: adapterDaftar
+private var arDaftar: MutableList<daftarBelanja> = mutableListOf()
 
 class MainActivity : AppCompatActivity() {
 
@@ -42,29 +42,39 @@ class MainActivity : AppCompatActivity() {
         fabAdd.setOnClickListener {
             startActivity(Intent(this, TambahDaftar::class.java))
         }
-        super.onStart()
-        CoroutineScope(Dispatchers.Main).async {
-            val daftarBelanja = DB.fundaftarBelanjaDAO().selectAll()
-            Log.d("data ROOM", daftarBelanja.toString())
-            adpDaftar.isiData(daftarBelanja)
-        }
+
+        // Inisialisasi adapter dan RecyclerView
         adpDaftar = adapterDaftar(arDaftar)
 
-        var _rvDaftar = findViewById<RecyclerView>(R.id.rvNotes)
+        val _rvDaftar = findViewById<RecyclerView>(R.id.rvNotes)
         _rvDaftar.layoutManager = LinearLayoutManager(this)
         _rvDaftar.adapter = adpDaftar
 
         adpDaftar.setOnItemClickCallback(
             object : adapterDaftar.OnItemClickCallback {
                 override fun delData(dtBelanja: daftarBelanja) {
-                    CoroutineScope(Dispatchers.IO).async {
+                    CoroutineScope(Dispatchers.IO).launch {
                         DB.fundaftarBelanjaDAO().delete(dtBelanja)
-                        val daftar = DB.fundaftarBelanjaDAO().selectAll()
-                        withContext(Dispatchers.Main) {
-                            adpDaftar.isiData(daftar)
-                        }
+                        loadData()
                     }
                 }
-            })
+            }
+        )
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Memuat ulang data setiap kali aktivitas kembali aktif
+        CoroutineScope(Dispatchers.IO).launch {
+            loadData()
+        }
+    }
+
+    private suspend fun loadData() {
+        val daftarBelanja = DB.fundaftarBelanjaDAO().selectAll()
+        withContext(Dispatchers.Main) {
+            Log.d("data ROOM", daftarBelanja.toString())
+            adpDaftar.isiData(daftarBelanja)
+        }
     }
 }
