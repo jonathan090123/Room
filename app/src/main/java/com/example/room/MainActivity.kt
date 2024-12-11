@@ -3,6 +3,7 @@ package com.example.room
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import androidx.appcompat.widget.SearchView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -60,7 +61,21 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         )
+
+        val _searchView = findViewById<SearchView>(R.id.searchView)
+        _searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                query?.let { searchDatabase(it) }
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                newText?.let { searchDatabase(it) }
+                return false
+            }
+        })
     }
+
 
     override fun onResume() {
         super.onResume()
@@ -75,6 +90,21 @@ class MainActivity : AppCompatActivity() {
         withContext(Dispatchers.Main) {
             Log.d("data ROOM", daftarBelanja.toString())
             adpDaftar.isiData(daftarBelanja)
+        }
+    }
+
+    private fun searchDatabase(query: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val daftarBelanja = DB.fundaftarBelanjaDAO()
+                .selectAll()
+                .filter {
+                    it.item?.contains(query, ignoreCase = true) == true ||
+                            it.jumlah?.contains(query, ignoreCase = true) == true
+                }
+
+            withContext(Dispatchers.Main) {
+                adpDaftar.isiData(daftarBelanja)
+            }
         }
     }
 }

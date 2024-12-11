@@ -8,10 +8,22 @@
     tools:context=".MainActivity"
     android:orientation="vertical">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvNotes"
+
+    <androidx.appcompat.widget.SearchView
+        android:id="@+id/searchView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:queryHint="Cari daftar belanja..."
+        android:layout_margin="8dp"
+        android:elevation="4dp"
+        tools:ignore="MissingConstraints" />
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvNotes"
+        android:layout_width="408dp"
+        android:paddingTop="35dp"
+        android:layout_height="204dp"
         tools:ignore="MissingConstraints">
 
     </androidx.recyclerview.widget.RecyclerView>
