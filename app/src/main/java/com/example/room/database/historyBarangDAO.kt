@@ -2,6 +2,7 @@ package com.example.room.database
 
 import androidx.room.Dao
 import androidx.room.Database
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -15,6 +16,9 @@ interface historyBarangDAO {
 
     @Query("SELECT * FROM historyBarang")
     suspend fun getAll(): List<historyBarang>
+
+    @Delete
+    suspend fun delete(history: historyBarang) // Fungsi untuk menghapus data
 }
 
 @Database(entities = [historyBarang::class], version = 1)

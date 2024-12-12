@@ -52,7 +52,7 @@ class TambahDaftar : AppCompatActivity() {
         } else {
             _btnTambah.visibility = View.GONE
             _btnUpdate.visibility = View.VISIBLE
-            _etItem.isEnabled = false
+            _etItem.isEnabled = true
 
             CoroutineScope(Dispatchers.IO).launch {
                 val item = DB.fundaftarBelanjaDAO().getItem(iID)

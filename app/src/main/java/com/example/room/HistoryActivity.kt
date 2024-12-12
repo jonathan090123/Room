@@ -21,10 +21,21 @@ class HistoryActivity : AppCompatActivity() {
         rvHistory.layoutManager = LinearLayoutManager(this)
 
         CoroutineScope(Dispatchers.IO).launch {
-            val historyList = DB.funHistoryBarangDAO() .getAll() // Ambil data dari tabel historyBarang
+            val historyList = DB.funHistoryBarangDAO().getAll().toMutableList()
             withContext(Dispatchers.Main) {
-                historyAdapter = HistoryAdapter(historyList)
+                historyAdapter = HistoryAdapter(historyList) { history ->
+                    deleteHistory(history)
+                }
                 rvHistory.adapter = historyAdapter
+            }
+        }
+    }
+
+    private fun deleteHistory(history: historyBarang) {
+        CoroutineScope(Dispatchers.IO).launch {
+            DB.funHistoryBarangDAO().delete(history) // Tambahkan fungsi delete di DAO jika belum ada
+            withContext(Dispatchers.Main) {
+                historyAdapter.removeItem(history)
             }
         }
     }

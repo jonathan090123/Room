@@ -18,11 +18,11 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvHistory"
         android:layout_width="408dp"
-        android:layout_height="204dp"
+        android:layout_height="wrap_content"
         android:paddingTop="55dp"
         tools:ignore="MissingConstraints"
         tools:layout_editor_absoluteX="1dp"
-        tools:layout_editor_absoluteY="0dp">
+        tools:layout_editor_absoluteY="1dp">
 
     </androidx.recyclerview.widget.RecyclerView>
 
