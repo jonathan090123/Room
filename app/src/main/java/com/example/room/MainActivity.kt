@@ -3,6 +3,7 @@ package com.example.room
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.Button
 import androidx.appcompat.widget.SearchView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -12,13 +13,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.room.database.daftarBelanja
 import com.example.room.database.daftarBelanjaDB
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-private lateinit var DB: daftarBelanjaDB
-private lateinit var adpDaftar: adapterDaftar
+lateinit var DB: daftarBelanjaDB
+lateinit var adpDaftar: adapterDaftar
 private var arDaftar: MutableList<daftarBelanja> = mutableListOf()
 
 class MainActivity : AppCompatActivity() {
@@ -50,6 +52,14 @@ class MainActivity : AppCompatActivity() {
         val _rvDaftar = findViewById<RecyclerView>(R.id.rvNotes)
         _rvDaftar.layoutManager = LinearLayoutManager(this)
         _rvDaftar.adapter = adpDaftar
+
+        val fabHistory: FloatingActionButton = findViewById(R.id.fabBtnHistory)
+        fabHistory.setOnClickListener {
+            // Navigasi ke halaman HistoryActivity
+            val intent = Intent(this, HistoryActivity::class.java)
+            startActivity(intent)
+        }
+
 
         adpDaftar.setOnItemClickCallback(
             object : adapterDaftar.OnItemClickCallback {
